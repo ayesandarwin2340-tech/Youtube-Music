@@ -38,6 +38,10 @@ RUN useradd -m -u 1000 botuser && \
     mkdir -p /app && \
     chown -R botuser:botuser /app
 
+# Create necessary directories
+RUN mkdir -p /tmp/downloads && \
+    chown -R botuser:botuser /tmp/downloads
+
 # Copy virtual environment from builder
 COPY --from=builder /venv /venv
 
@@ -47,11 +51,7 @@ WORKDIR /app
 # Copy application files
 COPY --chown=botuser:botuser main.py .
 COPY --chown=botuser:botuser requirements.txt .
-
-# Create necessary directories with proper permissions
-RUN mkdir -p /tmp/downloads && \
-    chown -R botuser:botuser /tmp/downloads && \
-    chown -R botuser:botuser /app
+COPY --chown=botuser:botuser cookies.txt .
 
 # Switch to non-root user
 USER botuser
