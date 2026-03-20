@@ -1,3 +1,24 @@
-pyrogram
-tgcrypto
-yt-dlp
+# Core dependencies
+yt-dlp>=2024.10.22
+pyrogram>=2.0.0
+tgcrypto>=1.2.5
+requests>=2.31.0
+aiofiles>=23.2.1
+
+# Database
+sqlite3-advanced>=1.0.0
+
+# Audio processing (optional but recommended)
+ffmpeg-python>=0.2.0
+
+# Utility
+python-dotenv>=1.0.0
+colorama>=0.4.6
+tqdm>=4.66.1
+
+# Security
+cryptography>=41.0.0
+
+# For better performance
+uvloop>=0.19.0  # Linux only, remove if on Windows
+orjson>=3.9.0   # Faster JSON processing
