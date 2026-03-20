@@ -18,7 +18,7 @@ API_ID = int(os.getenv("API_ID", "0"))
 API_HASH = os.getenv("API_HASH", "")
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 OWNER_ID = int(os.getenv("OWNER_ID", "0"))  # မင်း Telegram ID ထည့်ပါ
-SUPPORT_USERNAME = "@your_username"  # မင်း Username ထည့်ပါ
+SUPPORT_USERNAME = "@zinko158"  # မင်း Username ထည့်ပါ
 
 # ====== CONSTANTS ======
 WORKING_DIR = "/tmp"
