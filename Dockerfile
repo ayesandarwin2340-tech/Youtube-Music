@@ -45,7 +45,7 @@ COPY --from=builder /venv /venv
 WORKDIR /app
 
 # Copy application files
-COPY --chown=botuser:botuser bot.py .
+COPY --chown=botuser:botuser main.py .
 COPY --chown=botuser:botuser requirements.txt .
 
 # Create necessary directories with proper permissions
