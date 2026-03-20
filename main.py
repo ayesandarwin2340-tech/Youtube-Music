@@ -623,8 +623,9 @@ async def download_song(message, query):
     tracker = ProgressTracker(status_msg, lang)
     cookies_path = get_cookies_path()
     
+    # 🔴 ပြင်ဆင်ချက် ၁။ format ကို "bestaudio/best" လို့ပဲ ထားလိုက်ပါမယ် (m4a ကန့်သတ်ချက်ဖြုတ်လိုက်ပါပြီ)
     ydl_opts = {
-        "format": "bestaudio[ext=m4a]/bestaudio/best",
+        "format": "bestaudio/best",
         "default_search": "ytsearch1" if not any(site in query.lower() for site in SUPPORTED_SITES) else None,
         "outtmpl": os.path.join(WORKING_DIR, "%(title).100s.%(ext)s"),
         "quiet": True,
@@ -652,26 +653,25 @@ async def download_song(message, query):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             max_retries = 3
             is_url = any(site in query.lower() for site in SUPPORTED_SITES)
-            
-            # 🔴 ပြင်ဆင်ထားသည့်အပိုင်း စတင်ပါပြီ (info ကို None အဖြစ် အရင်သတ်မှတ်မယ်)
             info = None  
             
             for attempt in range(max_retries):
                 try:
-                    # Async extraction to prevent blocking
                     info = await asyncio.to_thread(extract_ydl_info, ydl, query, is_url)
                     break
                 except Exception as e:
-                    # နောက်ဆုံးအကြိမ်ဆိုရင် error တက်ခိုင်းလိုက်မယ်
                     if attempt == max_retries - 1:
                         raise e
                         
                     error_str = str(e)
-                    if "Requested format is not available" in error_str:
+                    # 🔴 ပြင်ဆင်ချက် ၂။ Format မရဘူးဆိုရင် အသံသက်သက်မဟုတ်ဘဲ ရတဲ့ Format (Video ပါတာဖြစ်ဖြစ်) ကိုပါ ဆွဲပြီးမှ mp3 အဖြစ် ပြောင်းပါမယ်
+                    if "Requested format" in error_str or "format" in error_str.lower():
                         try:
                             await status_msg.edit("⚠️ **Trying alternative format...**")
                         except MessageNotModified: pass
-                        ydl_opts["format"] = "bestaudio/best" if attempt == 0 else "worstaudio/worst"
+                        
+                        # ပထမတစ်ကြိမ် error တက်ရင် "best" ကိုသုံးမယ်၊ ဒုတိယတစ်ကြိမ်ဆို "worst" ကိုသုံးမယ်
+                        ydl_opts["format"] = "best" if attempt == 0 else "worst"
                         ydl = yt_dlp.YoutubeDL(ydl_opts)
                     else:
                         wait_time = (attempt + 1) * 5
@@ -680,10 +680,8 @@ async def download_song(message, query):
                         except MessageNotModified: pass
                         await asyncio.sleep(wait_time)
             
-            # 🔴 info ထဲ Data မရောက်ခဲ့ရင် အောက်ကို ဆက်မသွားအောင် တားလိုက်မယ်
             if not info:
                 raise Exception("Failed to extract video information.")
-            # 🔴 ပြင်ဆင်ထားသည့်အပိုင်း ပြီးဆုံးပါပြီ
 
             filename = ydl.prepare_filename(info)
             if not os.path.exists(filename):
@@ -748,7 +746,6 @@ async def download_song(message, query):
     finally:
         await download_queue.remove(user.id)
         CacheManager.clean_cache()
-
 
 # ====== INLINE MODE ======
 @app.on_inline_query()
